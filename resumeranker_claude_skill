@@ -1,0 +1,173 @@
+---
+name: resume-ranker
+description: >
+  Score and rank a resume against a job description (JD) out of 100 from two perspectives:
+  (1) ATS (Applicant Tracking System) keyword/format match, and (2) Hiring Manager fit.
+  Use this skill whenever a user uploads or pastes a resume AND a job description and wants
+  to know how well they match, get a score, understand gaps, or improve their resume for a
+  specific role. Trigger on phrases like "rank my resume", "score my resume", "how does my
+  resume match", "resume vs job description", "ATS score", "will I pass ATS", "hiring manager
+  perspective", "resume fit", "how do I compare to the JD", or any time the user provides
+  both a resume and a JD together. Even if the user only says "check my resume against this
+  job posting" — use this skill.
+---
+
+# Resume Ranker Skill
+
+Score a resume against a job description out of 100 from two critical perspectives:
+**ATS (Applicant Tracking System)** and **Hiring Manager**.
+
+---
+
+## Inputs
+
+Collect both of these before proceeding:
+1. **Resume** — pasted text, uploaded file (.pdf, .docx, .txt), or content already in context
+2. **Job Description (JD)** — pasted text or URL
+
+If either is missing, ask the user to provide it before continuing.
+
+---
+
+## Step 1: Parse & Extract
+
+### From the JD, extract:
+- **Required skills / keywords** (hard skills, tools, technologies, certifications)
+- **Preferred / nice-to-have skills**
+- **Years of experience** requirements
+- **Education** requirements
+- **Key responsibilities** (top 5–7 action themes)
+- **Seniority level** (IC vs. manager, junior/mid/senior)
+- **Industry/domain** context
+
+### From the Resume, extract:
+- **Skills listed** (technical + soft)
+- **Job titles & seniority progression**
+- **Years of experience** (total + relevant)
+- **Education**
+- **Accomplishments** (quantified results, impact statements)
+- **Formatting signals**: bullet points, section headers, use of tables/columns (ATS risk)
+- **Keywords density**: which JD keywords appear vs. are absent
+
+---
+
+## Step 2: ATS Score (out of 100)
+
+ATS systems filter resumes before a human ever sees them. Score based on:
+
+| Category | Weight | What to assess |
+|---|---|---|
+| Keyword Match | 40% | % of required JD keywords present in resume |
+| Job Title Alignment | 15% | Does resume title match or closely mirror JD title? |
+| Skills Section | 15% | Explicit skills section present; hard skills listed clearly |
+| Education Match | 10% | Meets stated education requirements |
+| Format Compatibility | 10% | No tables, columns, headers/footers, images, or graphics that break parsing |
+| File & Structure | 10% | Standard section names (Experience, Education, Skills); reverse-chron order |
+
+**Scoring:**
+- Calculate each category score, apply weights, sum to get ATS Score /100
+- Flag any **ATS red flags** (e.g., fancy formatting, missing keywords, non-standard section names)
+
+---
+
+## Step 3: Hiring Manager Score (out of 100)
+
+A human hiring manager cares about signal, not just keywords. Score based on:
+
+| Category | Weight | What to assess |
+|---|---|---|
+| Relevant Experience | 30% | Does work history map to core JD responsibilities? |
+| Quantified Impact | 20% | Are accomplishments measurable (%, $, scale, outcomes)? |
+| Seniority & Trajectory | 15% | Does career progression fit the role level? |
+| Domain / Industry Fit | 15% | Relevant domain experience (industry, company type, scale) |
+| Skills Depth | 10% | Are required skills demonstrated in context, not just listed? |
+| Presentation & Clarity | 10% | Easy to scan? Clear narrative? No typos or clutter? |
+
+**Scoring:**
+- Calculate each category score, apply weights, sum to get Hiring Manager Score /100
+
+---
+
+## Step 4: Output Format
+
+Present results in this exact structure:
+
+---
+
+### 📄 Resume vs. JD: Match Report
+
+**Role:** [Job Title] at [Company if known]
+
+---
+
+#### 🤖 ATS Score: [X]/100
+
+> _How well your resume will survive automated screening_
+
+| Category | Score | Notes |
+|---|---|---|
+| Keyword Match | X/40 | [brief note] |
+| Job Title Alignment | X/15 | [brief note] |
+| Skills Section | X/15 | [brief note] |
+| Education Match | X/10 | [brief note] |
+| Format Compatibility | X/10 | [brief note] |
+| File & Structure | X/10 | [brief note] |
+
+**⚠️ ATS Red Flags:**
+- [List any format or keyword issues that could cause auto-rejection]
+
+**Missing Keywords to Add:**
+- [List top 5–8 high-priority keywords from JD missing in resume]
+
+---
+
+#### 👤 Hiring Manager Score: [X]/100
+
+> _How compelling your resume looks to a human reviewer_
+
+| Category | Score | Notes |
+|---|---|---|
+| Relevant Experience | X/30 | [brief note] |
+| Quantified Impact | X/20 | [brief note] |
+| Seniority & Trajectory | X/15 | [brief note] |
+| Domain / Industry Fit | X/15 | [brief note] |
+| Skills Depth | X/10 | [brief note] |
+| Presentation & Clarity | X/10 | [brief note] |
+
+**💡 Top Hiring Manager Concerns:**
+- [2–4 honest observations a hiring manager would have]
+
+---
+
+#### 🏆 Overall Match: [Average of both scores]/100
+
+**Verdict:** [One of: ✅ Strong Match | 🟡 Competitive with Gaps | 🔴 Significant Gaps]
+
+---
+
+#### 🔧 Top 5 Recommendations to Improve Your Score
+
+1. **[Action]** — [Specific, actionable advice tied to a gap]
+2. **[Action]** — ...
+3. **[Action]** — ...
+4. **[Action]** — ...
+5. **[Action]** — ...
+
+---
+
+## Tone & Style Notes
+
+- Be honest and specific — vague praise is useless. If a resume is weak in an area, say so clearly but constructively.
+- Tailor recommendations to the specific JD, not generic resume advice.
+- If a keyword appears in the resume but in a weak context (e.g., listed once with no supporting experience), note it as a "weak signal" rather than a full match.
+- Do not inflate scores. A score of 75+ should mean genuinely competitive. A score of 90+ should be rare and mean the resume is an excellent match.
+
+---
+
+## Edge Cases
+
+- **No explicit skills section**: Penalize ATS score; note it in red flags.
+- **Career switcher**: Note the pivot explicitly in Hiring Manager notes; assess transferable skills.
+- **Overqualified**: Flag this as a hiring manager concern.
+- **PDF/DOCX upload**: Use file-reading skill to extract text first if content is not already in context.
+- **URL for JD**: Use web_fetch to retrieve the job posting content.
